@@ -3,7 +3,7 @@ This repository contains code for the study "GCN-Greedy: A Hybrid Framework  usi
 We use GCN network to solve location set covering problem (LSCP) and maximum covering location problem (MCLP) problems.The optimization of the loss function takes into account the characteristics of covering location problems.
 Our model is more accurate and more efficient than classical heuristic algorithms.
 
-![framework](img/framework.png)
+![framework](img/framework.jpg)
 
 ## Usage
 We ran our code using Python 3.8.0, PyTorch 1.12.1 and CUDA 11.7.
