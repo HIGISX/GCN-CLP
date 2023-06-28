@@ -1,0 +1,7 @@
+dgl_cuda11.6==0.9.1
+logzero==1.7.0
+networkx==2.8.4
+networkx==2.8.8
+numpy==1.23.3
+torch==1.12.1
+tqdm==4.64.1
