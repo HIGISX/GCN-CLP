@@ -1,16 +1,12 @@
 import torch
 import torch.nn as nn
-from dgl.nn.pytorch import GraphConv,GATConv
+from dgl.nn.pytorch import GraphConv, GATConv
+
 from post_process import lscp_greedy, mclp_greedy
 
+
 class GCN(nn.Module):
-    def __init__(self,
-                 in_feats,
-                 n_hidden,
-                 n_classes,
-                 n_layers,
-                 activation,
-                 dropout):
+    def __init__(self, in_feats, n_hidden, n_classes, n_layers, activation, dropout):
         super(GCN, self).__init__()
         self.layers = nn.ModuleList()
         self._LR_multiplier_list = []
@@ -38,13 +34,9 @@ class GCN(nn.Module):
 
 
 class GAT(nn.Module):
-    def __init__(self,
-                     in_feats,
-                     n_hidden,
-                     n_classes,
-                     n_layers,
-                     activation,
-                     heads=[8,1]):
+    def __init__(
+        self, in_feats, n_hidden, n_classes, n_layers, activation, heads=[8, 1]
+    ):
         super(GAT, self).__init__()
         self.layers = nn.ModuleList()
         self._violations_epoch = []
@@ -79,18 +71,19 @@ class GAT(nn.Module):
                 feat_drop=0.6,
                 attn_drop=0.6,
                 activation=torch.sigmoid,
-                )
+            )
         )
 
     def forward(self, g, inputs):
         h = inputs.to(torch.float32)
         for i, layer in enumerate(self.gat_layers):
             h = layer(g, h)
-            if i == len(self.gat_layers)-1:  # last layer
+            if i == len(self.gat_layers) - 1:  # last layer
                 h = h.mean(1)
             else:  # other layer(s)
                 h = h.flatten(1)
         return h
+
 
 class HindsightLoss(nn.Module):
     def __init__(self):
@@ -109,11 +102,16 @@ class HindsightLoss(nn.Module):
             y = torch.sum(labels).item()
             gap = abs(y - greedy_upper_bounds)
         else:
-            greedy_upper_bounds, label_coverd = mclp_greedy(output, probmaps, A, labels.tolist())
+            greedy_upper_bounds, label_coverd = mclp_greedy(
+                output, probmaps, A, labels.tolist()
+            )
             gap = abs(label_coverd - greedy_upper_bounds)
         output = output.permute(1, 0)
-        weight = torch.sum(labels).item()/output.shape[1]
-        self.ce_func = nn.BCELoss(torch.tensor([1/weight,1-1/weight], device=torch.device("cuda:0")), reduction="none")
+        weight = torch.sum(labels).item() / output.shape[1]
+        self.ce_func = nn.BCELoss(
+            torch.tensor([1 / weight, 1 - 1 / weight], device=torch.device("cuda:0")),
+            reduction="none",
+        )
         loss = torch.min(torch.mean(self.ce_func(output, _labels), axis=1))
         loss = loss + gap
         return loss, greedy_upper_bounds

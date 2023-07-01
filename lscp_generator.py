@@ -10,7 +10,7 @@ from pathlib import Path
 from logzero import logger
 
 
-class LSCPGenerator():
+class LSCPGenerator:
     def __init__(self):
         self.model_state_path = None
 
@@ -28,8 +28,9 @@ class LSCPGenerator():
 
     @staticmethod
     def __prepare_graph(nx_graph, weighted=False):
-        labels_given = "label" in rd.sample(nx_graph.nodes(data=True), 1)[0][
-            1].keys()  # sample random node and check if we have a label
+        labels_given = (
+            "label" in rd.sample(nx_graph.nodes(data=True), 1)[0][1].keys()
+        )  # sample random node and check if we have a label
         node_attrs = []
 
         if labels_given:
@@ -42,23 +43,33 @@ class LSCPGenerator():
         g = dgl.from_networkx(nx_graph, node_attrs=node_attrs)
         # covering_range = nx_graph.graph["range"]
         if labels_given:
-            g.ndata['label'] = g.ndata['label'].to(dgl.backend.data_type_dict['int8'])
+            g.ndata["label"] = g.ndata["label"].to(dgl.backend.data_type_dict["int8"])
 
         if not weighted:
-            g.ndata['weight'] = dgl.backend.tensor(np.ones(shape=(g.num_nodes(), 1)),
-                                                   dtype=dgl.backend.data_type_dict['int8'])
+            g.ndata["weight"] = dgl.backend.tensor(
+                np.ones(shape=(g.num_nodes(), 1)),
+                dtype=dgl.backend.data_type_dict["int8"],
+            )
 
         # force shape of weights (n x 1 shape)
-        g.ndata['weight'] = g.ndata['weight'].reshape(-1, 1).to(dgl.backend.data_type_dict['int8'])
-        g.ndata['cover'] = g.ndata['cover'].to(dgl.backend.data_type_dict['int8'])
-        g.ndata['cover_num'] = g.ndata['cover_num'].reshape(-1, 1).to(dgl.backend.data_type_dict['int8'])
+        g.ndata["weight"] = (
+            g.ndata["weight"].reshape(-1, 1).to(dgl.backend.data_type_dict["int8"])
+        )
+        g.ndata["cover"] = g.ndata["cover"].to(dgl.backend.data_type_dict["int8"])
+        g.ndata["cover_num"] = (
+            g.ndata["cover_num"].reshape(-1, 1).to(dgl.backend.data_type_dict["int8"])
+        )
 
         return g
 
-    def _prepare_instances(C, instance_directory: pathlib.Path, cache_directory, **kwargs):
+    def _prepare_instances(
+        C, instance_directory: pathlib.Path, cache_directory, **kwargs
+    ):
         cache_directory.mkdir(parents=True, exist_ok=True)
         weighted = kwargs.get("weighted", False)
-        dest_graphs_file = cache_directory / f"graphs_{'weighted' if weighted else 'unweighted'}.dgl"
+        dest_graphs_file = (
+            cache_directory / f"graphs_{'weighted' if weighted else 'unweighted'}.dgl"
+        )
         name_mapping_file = cache_directory / f"graph_names.json"
         range_mapping_file = cache_directory / f"graph_range.json"
         last_updated = 0
@@ -88,7 +99,7 @@ class LSCPGenerator():
             gs.append(g)
             graph_names.append(os.path.splitext(os.path.basename(graph_file))[0])
         dgl.save_graphs(str(dest_graphs_file), gs)
-        with open(name_mapping_file, "w", encoding='utf-8') as f:
+        with open(name_mapping_file, "w", encoding="utf-8") as f:
             json.dump(graph_names, f, ensure_ascii=False, sort_keys=True, indent=4)
 
     def process(self, train_data_path: pathlib.Path):
@@ -98,6 +109,7 @@ class LSCPGenerator():
 
         logger.info("Invoking training of " + str(self))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     generator = LSCPGenerator()
     generator.process(Path("D:/dataset/1000-lscp-train"))
