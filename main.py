@@ -18,10 +18,10 @@ if __name__ == "__main__":
         help="Directory containing input graphs (to be solved/trained on).",
     )
     parser.add_argument(
-        "output",
+        "--output",
         type=Path,
         action="store",
-        help="Folder in which the output (e.g. json containg statistics and solution will be stored, or trained weights)",
+        help="Folder in which the output (e.g. trained weights)",
     )
 
     parser.add_argument(

@@ -76,7 +76,6 @@ def mclp_greedy(prob_maps, num_prob_maps, A, label):
     for i in range(M):
         index_array = np.where(A[:, i] == 1)
         subsets.append(set(index_array[0].tolist()))
-    print(subsets)
     label_coverd = set()
     for index in range(len(label)):
         if label[index] == 1:

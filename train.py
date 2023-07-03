@@ -69,6 +69,8 @@ class Train:
         cuda = bool(args.cuda_devices)
         prob_maps = args.model_prob_maps
         problem = args.problem
+        if not os.path.exists(args.output):
+            os.mkdir(args.output)
 
         if cuda:
             cuda_dev = args.cuda_devices[0]
@@ -85,7 +87,7 @@ class Train:
             random.shuffle(dgl_graphs)
             logger.info("Loading training graphs.")
             # for train
-            for g in tqdm(dgl_graphs[: len(dgl_graphs) - 800]):
+            for g in tqdm(dgl_graphs[: int(0.9*len(dgl_graphs))]):
                 if self_loop:
                     g = dgl.remove_self_loop(g)
                     g = dgl.add_self_loop(g)
@@ -96,7 +98,7 @@ class Train:
                 A = g.adj(transpose=True, scipy_fmt="coo").toarray()
                 self.A_list.append(A)
             # for validate
-            for g in tqdm(dgl_graphs[len(dgl_graphs) - 1000 :]):
+            for g in tqdm(dgl_graphs[int(0.9*len(dgl_graphs)):]):
                 if self_loop:
                     g = dgl.remove_self_loop(g)
                     g = dgl.add_self_loop(g)
@@ -104,7 +106,7 @@ class Train:
                     g = dgl.remove_self_loop(g)
                 self.node_num = g.number_of_nodes()
                 validate_graphs.append(g)
-            logger.info(f"Loaded {len(dgl_graphs)-1000} graphs for training.")
+            logger.info(f"Loaded {len(validate_graphs)} graphs for training.")
 
         model = _load_model(
             self.node_num + 1,
@@ -116,23 +118,20 @@ class Train:
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=5e-4)
 
         num_epochs = args.epochs
-        status_update_every = max(1, int(0.1 * (len(dgl_graphs) - 1000)))
+        status_update_every = max(1, int(0.1 * len(training_graphs)))
         # initial
         min_gap = 100
+
         for epoch in range(num_epochs + 1):
-            # self.pi = self.pi / 2
             logger.info(f"Epoch {epoch}/{num_epochs}")
             epoch_losses = list()
-            # optimizer.param_groups[0]['lr'] = 5e-3
-            for gidx, graph in enumerate(tqdm(dgl_graphs[: len(dgl_graphs) - 1000])):
+            for gidx, graph in enumerate(tqdm(training_graphs)):
                 if self_loop:
                     graph = dgl.remove_self_loop(graph)
                     graph = dgl.add_self_loop(graph)
                 else:
                     graph = dgl.remove_self_loop(graph)
                 self.node_num = graph.number_of_nodes()
-                if self.node_num != 20:
-                    continue
                 A = graph.adj(transpose=True, scipy_fmt="coo").toarray()
                 if cuda:
                     graph = graph.to(cuda_dev)
@@ -158,18 +157,18 @@ class Train:
                 torch.save(
                     model.state_dict(),
                     args.output
-                    / f"{int(time.time())}_intermediate_model{prob_maps}_{epoch}_{np.mean(epoch_losses):.2f}.torch",
+                    / f"{int(time.time())}_{self.node_num}_intermediate_model{prob_maps}_{epoch}_{np.mean(epoch_losses):.2f}.torch",
                 )
             gap = self.validate(validate_graphs, model, problem=problem)
             if gap < min_gap:
                 min_gap = gap
-                torch.save(model.state_dict(), args.output / f"best_model_{gap}.torch")
+                torch.save(model.state_dict(), args.output / f"best_model_{self.node_num}_{gap}.torch")
         logger.info(
             f"Final: Average Epoch Loss = {np.mean(epoch_losses)}, Last Training Loss = {loss}"
         )
         torch.save(
             model.state_dict(),
-            args.output / f"{int(time.time())}_final_model{prob_maps}.torch",
+            args.output / f"{int(time.time())}_{self.node_num}_final_model{prob_maps}.torch",
         )
 
 
@@ -194,12 +193,3 @@ def scp_test_validate(test_data, weight_file, problem):
     period_time = time.time() - start_time
     print("mean_opt_gap:{},period_time:{}".format(mean_opt_gap, period_time))
 
-
-if __name__ == "__main__":
-    # test
-    test_data = (
-        "D:/dataset/20-mclp-test-feats/preprocessed/dgl_treesearch/graphs_weighted.dgl"
-    )
-    weight_file = "D:/models/mclp-20/best_model_1.374878381422499.torch"
-    problem = "mclp"
-    scp_test_validate(test_data, weight_file, problem)
