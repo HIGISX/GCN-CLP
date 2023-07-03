@@ -109,7 +109,7 @@ class HindsightLoss(nn.Module):
         output = output.permute(1, 0)
         weight = torch.sum(labels).item() / output.shape[1]
         self.ce_func = nn.BCELoss(
-            torch.tensor([1 / weight, 1 - 1 / weight], device=torch.device("cuda:0")),
+            torch.tensor([1 / weight], device=torch.device("cuda:0")),
             reduction="none",
         )
         loss = torch.min(torch.mean(self.ce_func(output, _labels), axis=1))

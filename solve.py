@@ -3,6 +3,7 @@ import time
 import numpy as np
 from logzero import logger
 import torch
+from tqdm import tqdm
 from utils import _load_model
 from post_process import mclp_greedy, lscp_greedy
 
@@ -35,7 +36,7 @@ class Solver:
 
 
 def solve(args):
-    cuda = bool(args.cuda_devs)
+    cuda = bool(args.cuda_devices)
     if not args.pretrained_weights:
         raise ValueError("--pretrained_weights flag is required for solving! Exiting.")
     dgl_graphs = dgl.load_graphs(
@@ -52,10 +53,11 @@ def solve(args):
     validate_graphs = []
     ys = []
     start_time = time.time()
-    for idx, g in enumerate(dgl_graphs):
+    s.load_model()
+    for idx, g in enumerate(tqdm(dgl_graphs)):
         if cuda:
             g = g.to(torch.device("cuda:0"))
-        if args.self_loop:
+        if args.self_loops:
             g = dgl.remove_self_loop(g)
             g = dgl.add_self_loop(g)
         else:
