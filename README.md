@@ -1,10 +1,13 @@
-# GCN-Greedy: A Hybrid Framework  using Graph Convolutional Network and Greedy algorithm for Covering Location Problem
-This repository contains code for the study "GCN-Greedy: A Hybrid Framework  using Graph Convolutional Network and Greedy algorithm for Covering Location Problem"
-We use GCN network to solve location set covering problem (LSCP) and maximum covering location problem (MCLP) problems.The optimization of the loss function takes into account the characteristics of covering location problems.
-Our model is more accurate and more efficient than classical heuristic algorithms.
-
-
-<img src="img/framework.jpg" width="500">
+# Dual hybrid frameworks combining graph convolutional network with decoding for covering location problem
+This repository contains code for the study "Dual hybrid frameworks combining graph convolutional network with decoding for covering location problem"
+We proposed two methods based on graph convolutional networks (GCN) to solve two types of covering location problems: 
+LSCP and the MCLP. The first method, GCN-Greedy, is a supervised algorithm that synergized with the Greedy algorithm as decoder. 
+It designs a specialized loss function to train the model, tailored to the characteristics of the two covering location problems. 
+The second method, reinforcement learning based on GCN with auto-regressive decoder (GCN-AR-RL), represents a reinforcement learning framework that integrates a GCN encoder with an auto-regressive decoder.
+The framework of GCN-Greedy:
+<img src="img/Figure3.jpg" width="500">
+The framework of GCN-AR-RL:
+<img src="img/Figure4.jpg" width="500">
 
 
 ## Usage
