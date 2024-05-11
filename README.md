@@ -4,9 +4,13 @@ We proposed two methods based on graph convolutional networks (GCN) to solve two
 LSCP and the MCLP. The first method, GCN-Greedy, is a supervised algorithm that synergized with the Greedy algorithm as decoder. 
 It designs a specialized loss function to train the model, tailored to the characteristics of the two covering location problems. 
 The second method, reinforcement learning based on GCN with auto-regressive decoder (GCN-AR-RL), represents a reinforcement learning framework that integrates a GCN encoder with an auto-regressive decoder.
+
 The framework of GCN-Greedy:
+
 <img src="img/Figure3.jpg" width="500">
-The framework of GCN-AR-RL:
+
+The framework of GCN-AR-RL: 
+
 <img src="img/Figure4.jpg" width="500">
 
 
