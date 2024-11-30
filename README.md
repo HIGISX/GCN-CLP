@@ -1,5 +1,20 @@
 # Dual hybrid frameworks combining graph convolutional network with decoding for covering location problem
-This repository contains code for the study "Dual hybrid frameworks combining graph convolutional network with decoding for covering location problem"
+This project is the code for the study: 
+
+Zhang, Y., Wang, S., Liang, H., Li, X., Wang, Z., & Lu, H. (2024). Dual hybrid frameworks combining graph convolutional network with decoding for covering location problem. Iscience, 27(5).[[Full article]](https://www.cell.com/iscience/fulltext/S2589-0042(24)01025-3)
+
+Paper reference:
+```bash
+@article{zhang2024dual,
+  title={Dual hybrid frameworks combining graph convolutional network with decoding for covering location problem},
+  author={Zhang, Yao and Wang, Shaohua and Liang, Haojian and Li, Xiao and Wang, Zhenbo and Lu, Hao},
+  journal={Iscience},
+  volume={27},
+  number={5},
+  year={2024},
+  publisher={Elsevier}
+}
+```
 We proposed two methods based on graph convolutional networks (GCN) to solve two types of covering location problems: 
 LSCP and the MCLP. The first method, GCN-Greedy, is a supervised algorithm that synergized with the Greedy algorithm as decoder. 
 It designs a specialized loss function to train the model, tailored to the characteristics of the two covering location problems. 
